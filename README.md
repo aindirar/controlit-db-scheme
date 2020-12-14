@@ -47,7 +47,7 @@ values
     ( 'company_4', '123452349012', 'Петр Сргеевич', '79123874455', 'director_4@yandex.ru', 'Федор Петрович', '79112228844', 'respondent_4@mail.ru');
 ```
 ```sql
-update "public".business_info set director_telephone = '79884567092' where id = 4;
+update public.business_info set director_telephone = '79884567092' where id = 4;
 ```
 ### country
 Таблица содержит информацию о странах
@@ -57,8 +57,8 @@ name | строка наименование страны
 #####  Примеры запросов:
 Список всех регионов:
 ```sql
-select region.name from "public".region
-inner join "public".district on region.district_id = district.id
+select region.name from public.region
+inner join public.district on region.district_id = district.id
 where district.country_id = 1;
 ```
 
@@ -71,13 +71,13 @@ country_id | id из таблицы [country](#country)
 #####  Примеры запросов:
 Список всех регионов:
 ```sql
-select region.name from "public".region
+select region.name from public.region
 where region.district_id = 3;
 ```
 Получение дистрибьютера:
 ```sql
-select cluster.distributor_id from "public"."cluster"
-inner join "public".cluster_link_district on cluster_id = cluster."id"
+select cluster.distributor_id from"public.cluster
+inner join public.cluster_link_district on cluster_id = cluster.id
 where cluster_link_district.district_id = 8;
 ```
 ### region
@@ -115,6 +115,24 @@ where city.id = 7;
 ```
 
 ### company
+Таблица содержит информацию о компании
+Поле | Описание
+------------ | -------------
+name | строка
+organization_type | строка для указания организационной формы: ООО, ЗАО, ИП и тп
+inn | `bigint` уникальный
+ogrn | `bigint` уникальный
+bik_bank | `integer` БИК банка
+bank_name | строка название банка
+bank_account | `numeric(20,0)` расчетный счет юридического лица, состоит из 20 цифр
+company_email | строка
+telephone | строка телефоны компании
+post_address | строка для почтового адрес компании
+company_type | строка для выбора типа пользователя системой: дилер или дистрибьютор
+availability | строка для указания признака доступности: включен, выключен и ограничен. По умолчанию включен. Если выключен – пользователь блокируется
+change_dealer | `boolean` возможность менять дилеров. По умолчанию "нет", включается администратором
+city_id | id из таблицы [city](#city)
+#####  Примеры запросов:
 Получение всех объектов (если дилер):
 ```sql
 ```
@@ -123,6 +141,8 @@ where city.id = 7;
 ```
 
 ### company_link_region
+Третья таблица для связки m2m таблиц company и region
+
 Привязывание компании к региону:
 ```sql
 ```
@@ -131,6 +151,8 @@ where city.id = 7;
 ```
 
 ### person_link_company
+Третья таблица для связки m2m таблиц person и company 
+
 Привязывание пользователя к компании:
 ```sql
 ```
@@ -139,6 +161,13 @@ where city.id = 7;
 ```
 
 ### cluster
+Таблица содержит информацию о кластерах
+Поле | Описание
+------------ | -------------
+name | строка
+base_cost | `double precision` 
+distributor_id | id из таблицы [company](#company)
+
 Установка дистрибьютера:
 ```sql
 ```
