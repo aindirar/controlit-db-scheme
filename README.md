@@ -22,7 +22,7 @@ usrrnd | строка идентификатор сессии
 #####  Примеры запросов:
 Получение всех админов. Получение списка компаний, к которым есть доступ у пользователя.
 ```sql
-select * from public.person where person.admin;
+select * from user where admin is true;
 ```
 
 ### business_info
@@ -47,7 +47,7 @@ values
     ( 'company_4', '123452349012', 'Петр Сргеевич', '79123874455', 'director_4@yandex.ru', 'Федор Петрович', '79112228844', 'respondent_4@mail.ru');
 ```
 ```sql
-update public.business_info set director_telephone = '79884567092' where id = 4;
+update "public".business_info set director_telephone = '79884567092' where id = 4;
 ```
 ### country
 Таблица содержит информацию о странах
@@ -57,8 +57,8 @@ name | строка наименование страны
 #####  Примеры запросов:
 Список всех регионов:
 ```sql
-select region.name from public.region
-inner join public.district on region.district_id = district.id
+select region.name from "public".region
+inner join "public".district on region.district_id = district.id
 where district.country_id = 1;
 ```
 
@@ -71,13 +71,13 @@ country_id | id из таблицы [country](#country)
 #####  Примеры запросов:
 Список всех регионов:
 ```sql
-select region.name from public.region
+select region.name from "public".region
 where region.district_id = 3;
 ```
 Получение дистрибьютера:
 ```sql
-select cluster.distributor_id from public.cluster
-inner join public.cluster_link_district on cluster_id = cluster.id
+select cluster.distributor_id from "public"."cluster"
+inner join "public".cluster_link_district on cluster_id = cluster."id"
 where cluster_link_district.district_id = 8;
 ```
 ### region
@@ -92,6 +92,9 @@ district_id | id из таблицы [district](#district)
 ```
 Получение всех городов в регионе:
 ```sql
+select city.name from public.city 
+inner join public.region on region.id = city.region_id
+where region_id = 6;
 ```
 
 ### city
@@ -106,6 +109,9 @@ region_id | id из таблицы [region](#region)
 ```
 Получение региона:
 ```sql
+select region.name from public.region 
+inner join public.city on region.id = city.region_id
+where city.id = 7;
 ```
 
 ### company
