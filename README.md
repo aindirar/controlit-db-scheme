@@ -18,7 +18,6 @@ email | строка
 password | строка для хранения хеша пароля
 admin | `boolean` является ли пользователь админом. По умолчанию `false`
 usrrnd | строка идентификатор сессии
-owner_id | id из таблицы [business_info](#business_info)
 
 #####  Примеры запросов:
 Получение всех админов. Получение списка компаний, к которым есть доступ у пользователя.
@@ -42,21 +41,33 @@ respondent_email | строка электронная почта ответсв
 #####  Примеры запросов:
 Создание нового `business_info` и редактирование по id. 
 ```sql
-INSERT INTO public.business_info ( 
+insert into public.business_info ( 
     company_name, inn, director, director_telephone, director_email, respondent, respondent_telephone, respondent_email)
-VALUES
-    ( 'company_4', '123452349012', 'Петр Сргеевич', '79123874455', 'director_4@yandex.ru', 'Федор Петрович', '79112228844', 'respondent_4@mail.ru');
+values
+    ('company_4', '123452349012', 'Петр Сргеевич', '79123874455', 'director_4@yandex.ru', 'Федор Петрович', '79112228844', 'respondent_4@mail.ru');
 ```
 ```sql
 update "public".business_info set director_telephone = '79884567092' where id = 4;
 ```
 ### country
+Таблица содержит информацию о странах
+Поле | Описание
+------------ | -------------
+name | строка наименование страны
 #####  Примеры запросов:
 Список всех регионов:
 ```sql
+select region.name from "public".region
+inner join "public".district on region.district_id = district.id
+where district.country_id = 1;
 ```
 
 ### district
+Таблица содержит информацию об округах
+Поле | Описание
+------------ | -------------
+name | строка наименование округа
+country_id | id из таблицы [country](#country)
 #####  Примеры запросов:
 Список всех регионов:
 ```sql
@@ -65,6 +76,12 @@ update "public".business_info set director_telephone = '79884567092' where id = 
 ```sql
 ```
 ### region
+Таблица содержит информацию о регионах
+Поле | Описание
+------------ | -------------
+name | строка наименование региона
+district_id | id из таблицы [district](#district)
+#####  Примеры запросов:
 Получение дистрибьютера:
 ```sql
 ```
@@ -73,6 +90,12 @@ update "public".business_info set director_telephone = '79884567092' where id = 
 ```
 
 ### city
+Таблица содержит информацию о городах
+Поле | Описание
+------------ | -------------
+name | строка наименование города
+region_id | id из таблицы [region](#region)
+#####  Примеры запросов:
 Получение дистрибьютера:
 ```sql
 ```
