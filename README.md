@@ -89,6 +89,15 @@ district_id | id из таблицы [district](#district)
 #####  Примеры запросов:
 Получение дистрибьютера:
 ```sql
+select c.distributor_id from public.cluster c
+inner join public.cluster_link_region c2r on c2r.cluster_id = c.id
+where c2r.region_id = 36; 
+
+select c.distributor_id from public.region r
+right join public.cluster_link_district c2d on c2d.district_id = r.district_id
+right join public.cluster c on c.id = c2d.cluster_id
+where r.id = 8;
+
 ```
 Получение всех городов в регионе:
 ```sql
@@ -173,44 +182,90 @@ distributor_id | id из таблицы [company](#company)
 ```
 
 ### cluster_link_city
+Третья таблица для связки m2m таблиц cluster и city 
 Привязывание города к кластеру:
 ```sql
 ```
 
 ### cluster_link_country
+Третья таблица для связки m2m таблиц cluster и country 
 Привязывание страны к кластеру:
 ```sql
 ```
 ### cluster_link_district
+Третья таблица для связки m2m таблиц cluster и district 
 Привязывание округа к кластеру:
 ```sql
 ```
 
 ### cluster_link_region
+Третья таблица для связки m2m таблиц cluster и region
 Привязывание области к кластеру:
 ```sql
 ```
 ### file
+Таблица содержит информацию о файлах
+Поле | Описание
+------------ | -------------
+name | строка названия файла
+path | строка для указания пути до файсла
+extension | строка расширения файла
 Создание файла:
 ```sql
 ```
 
-### media
-Создание медиа об объекте:
-```sql
-```
 
 ### contract
+Таблица содержит информацию о контрактах
+Поле | Описание
+------------ | -------------
+contract_number | строка для номера контракта
+file_id | id из таблицы [file](#file)
+company_id | id из таблицы [company](#company)
 Создание договора с юрлицом (сначала файл, потом запись в контракт):
 ```sql
 ```
 
 ### commercial_proposal
+Таблица содержит информацию о коммерческих предложениях
+Поле | Описание
+------------ | -------------
+date | `date` дата создания коммрческого предложения
+file_id | id из таблицы [file](#file)
 Создание нового Коммерческого предложения. Получение последнего созданного:
 ```sql
 ```
 
 ### building
+Таблица содержит информацию об объектах
+Поле | Описание
+------------ | -------------
+name | строка наименование объекта
+status | строка для указания статус объекта. По умолчанию 'черновик'
+building_type | строка для указания типа объекта
+address | строка
+latitude | `double precision` координаты объекты, широта
+longitude | `double precision` координаты объекты, долгота
+square_roof | `double precision` площадь кровли объекта в кв.м.
+roof_type | строка для указания типа кровли: ПВХ-кровля или битумная наплавляемая
+roof_description | строка для описания марок и производителей по кровле
+discount | `double precision` скидка объекта. Заполняется администратором, по умолчанию 0
+guarantee | `integer` гарантия на кровлю, счет в месяцах 
+start_date | `date` планируемая дата начала реализации
+start_date_actual | `date` фактическая дата начала реализации
+finish_date_actual | `date` фактическая дата окончания
+extra_info | строка для дополнительной информации об объекте
+is_moderated | `boolean` может ли видеть и редактировать объект. По умолчанию False
+city_id | id из таблицы [city](#city)
+dealer_id | id из таблицы [company](#company)
+creator_id | id из таблицы [business_info](#business_info)
+subcontractor_id | id из таблицы [business_info](#business_info)
+owner_id | id из таблицы [business_info](#business_info)
+management_company_id | id из таблицы [business_info](#business_info)
+client_id | id из таблицы [business_info](#business_info)
+planner_id | id из таблицы [business_info](#business_info)
+general_contractor_id | id из таблицы [business_info](#business_info)
+technical_client_id | id из таблицы [business_info](#business_info)
 Получение общей информации по объекты (по всем полям вложенные join):
 ```sql
 ```
@@ -227,8 +282,15 @@ distributor_id | id из таблицы [company](#company)
 ```sql
 ```
 
-### building_link_media
-НАДО УБРАТЬ
+### media
+Поле | Описание
+------------ | -------------
+url | строка
+building_id | id из таблицы [building](#building)
+Создание медиа об объекте:
+```sql
+```
+
 ### building_photos_link_file
 Добавление фотографии к объекту (сначала файл, потом инстерт в третью таблицу):
 ```sql
@@ -257,10 +319,20 @@ distributor_id | id из таблицы [company](#company)
 ```
 
 ### visit_building
+Поле | Описание
+------------ | -------------
+view_date | `timestamp` без таймзоны. Все значения хранятся в UTC. По умолчанию устанавливает текущее временное значение.
+building_id | id из таблицы [building](#building)
+person_id | id из таблицы [person](#person)
 Запись о просмотре объекта:
 ```sql
 ```
 ### diagnostic
+Поле | Описание
+------------ | -------------
+diagnostic_date | `date` дата проведения инструментальной диагностики
+diagnostic_type | строка для увказания вида инструментальной диагностики: полная или локальная
+building_id | id из таблицы [building](#building)
 Создание диагностики:
 ```sql
 ```
@@ -269,6 +341,14 @@ distributor_id | id из таблицы [company](#company)
 ```sql
 ```
 ### presentation
+Таблица содержит информацию о презентациях
+Поле | Описание
+------------ | -------------
+presentation_date | `date` дата проведения презентации
+person_type | строка кому провдена презентация : подрядчик, собственник
+description | строка
+business_info_id | id из таблицы [business_info](#business_info)
+building_id | id из таблицы [building](#building)
 Созадание презентации:
 ```sql
 ```
@@ -276,6 +356,17 @@ distributor_id | id из таблицы [company](#company)
 ```sql
 ```
 ### supply
+Таблица содержит информацию о заяках на поставку
+Поле | Описание
+------------ | -------------
+supply_date | `date` дата проведения презентации
+material_amount | `double precision` количество материала в кв.м.
+cost | `double precision`
+requestor_name | строка для указания, кто сформировал заявку (ФИО)
+telephone | строка
+email | строка
+comments | строка
+status | строка для статуса заявки на поставку: одобрена, не одобрена, на рассмотрении. По умолчанию 'на рассмотрении'
 Подача заявки на поставку дилером:
 ```sql
 ```
@@ -283,6 +374,14 @@ distributor_id | id из таблицы [company](#company)
 ```sql
 ```
 ### request
+Таблица содержит информацию о заяках на привязку к объекту
+Поле | Описание
+------------ | -------------
+requestor_name | строка для указания, кто сформировал заявку (ФИО)
+telephone | строка
+email | строка
+comments | строка
+status | строка для статуса заявки на поставку: одобрена, не одобрена, на рассмотрении. По умолчанию 'на рассмотрении'
 Получение открытых запросов на объекты дилерами в кластере:
 ```sql
 ```
