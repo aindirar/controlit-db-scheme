@@ -22,7 +22,7 @@
   #####  Примеры запросов:
   Получение всех админов. Получение списка компаний, к которым есть доступ у пользователя.
   ```sql
-  select * from user where admin is true;
+select * from public.person where person.admin;
   ```
 
   ### business_info
@@ -76,7 +76,7 @@
   ```
   Получение дистрибьютера:
   ```sql
-  select cluster.distributor_id from"public.cluster
+  select cluster.distributor_id from public.cluster
   inner join public.cluster_link_district on cluster_id = cluster.id
   where cluster_link_district.district_id = 8;
   ```
