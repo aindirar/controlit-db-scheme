@@ -195,6 +195,8 @@ where c.company_type = 'дилер'
 
   Установка дистрибьютера:
   ```sql
+  insert into public.cluster (name, base_cost, distributor_id)
+  values ('cluster_name', 400, 4);
   ```
 
   ### cluster_link_city
@@ -202,6 +204,8 @@ where c.company_type = 'дилер'
   
   Привязывание города к кластеру:
   ```sql
+  insert into public.cluster_link_city (cluster_id, city_id)
+  values (1, 42);
   ```
 
   ### cluster_link_country
@@ -209,12 +213,16 @@ where c.company_type = 'дилер'
   
   Привязывание страны к кластеру:
   ```sql
+  insert into public.cluster_link_country (cluster_id, country_id)
+  values (3, 3);
   ```
   ### cluster_link_district
   Третья таблица для связки m2m таблиц cluster и district 
   
   Привязывание округа к кластеру:
   ```sql
+  insert into public.cluster_link_district (cluster_id, district_id)
+  values (3, 8);
   ```
 
   ### cluster_link_region
@@ -222,6 +230,8 @@ where c.company_type = 'дилер'
   
   Привязывание области к кластеру:
   ```sql
+  insert into public.cluster_link_region (cluster_id, region_id)
+  values (2, 36);
   ```
   ### file
   Таблица содержит информацию о файлах
@@ -232,6 +242,8 @@ where c.company_type = 'дилер'
   extension | строка расширения файла
   Создание файла:
   ```sql
+  insert into public.file ( name, path, extension)
+  values ('file_name', 'C:\Users\abc\dfeg', 'txt');
   ```
 
 
@@ -244,16 +256,21 @@ where c.company_type = 'дилер'
   company_id | id из таблицы [company](#company)
   Создание договора с юрлицом (сначала файл, потом запись в контракт):
   ```sql
+  insert into public.contract (contract_number, file_id, company_id)
+  select '123er', file.id, 2 from public.file
+  where file.name = 'file_name';
   ```
 
   ### commercial_proposal
   Таблица содержит информацию о коммерческих предложениях
   Поле | Описание
   ------------ | -------------
-  date | `date` дата создания коммрческого предложения
+  date | `date` дата создания коммерческого предложения
   file_id | id из таблицы [file](#file)
   Создание нового Коммерческого предложения. Получение последнего созданного:
   ```sql
+  select * from public.commercial_proposal
+  order by created desc limit 1;
   ```
 
   ### building
