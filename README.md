@@ -77,8 +77,8 @@ select * from public.person where person.admin;
   Получение дистрибьютера:
   ```sql
   select cluster.distributor_id from public.cluster
-  inner join public.cluster_link_district on cluster_id = cluster.id
-  where cluster_link_district.district_id = 8;
+  inner join public.cluster_link_district cl2d on cl2d.cluster_id = cluster.id
+  where cl2d.district_id = 8;
   ```
   ### region
   Таблица содержит информацию о регионах
@@ -252,6 +252,8 @@ where c.company_type = 'дилер'
   Поле | Описание
   ------------ | -------------
   contract_number | строка для номера контракта
+  registration_address | строка для адреса регистрации (прописки)
+  address_actual | строка для фактического адреса проживания
   file_id | id из таблицы [file](#file)
   company_id | id из таблицы [company](#company)
   Создание договора с юрлицом (сначала файл, потом запись в контракт):
@@ -303,20 +305,24 @@ where c.company_type = 'дилер'
   planner_id | id из таблицы [business_info](#business_info)
   general_contractor_id | id из таблицы [business_info](#business_info)
   technical_client_id | id из таблицы [business_info](#business_info)
-  Получение общей информации по объекты (по всем полям вложенные join):
+  Получение общей информации по объекту (по всем полям вложенные join):
   ```sql
   ```
   Получение всех медиа об объекте:
   ```sql
+  select media.* from public.building b
+  join public.media on media.building_id = b.id
+  where b.id = 1;
   ```
-  Получение дистрибьютера, если есть city:
+  Получение дистрибьютера:
   ```sql
   ```
   Получение всех фото:
   ```sql
-  ```
-  Получение всех медиа об объекте:
-  ```sql
+  select file.* from public.building b
+  join public.building_photos_link_file bp2f on bp2f.building_id = b.id
+  join public.file on file.id = bp2f.file_id
+  where b.id = 3;
   ```
 
   ### media
@@ -326,16 +332,29 @@ where c.company_type = 'дилер'
   building_id | id из таблицы [building](#building)
   Создание медиа об объекте:
   ```sql
+  insert into public.media (url, building_id)
+  values  ('url_name', 1);
   ```
 
   ### building_photos_link_file
+  Таблица содержит информацию о фотографиях завершенного объекта
   Добавление фотографии к объекту (сначала файл, потом инстерт в третью таблицу):
   ```sql
+  insert into public.file ( name, path, extension)
+  values ('photos_b3', 'C:\Users\S\Desktop\photo', 'png');
+
+  insert into public.building_photos_link_file (file_id, building_id)
+  select f.id, 3 from public.file f where f.name = 'photos_b3';
   ```
 
   ### building_roof_approval_link_file
   Добавление файлов подтверждения крыши объекта (сначала файл, потом инстерт в третью таблицу):
   ```sql
+  insert into public.file ( name, path, extension)
+  values ('roof_approval_b2', 'C:\Users\S\Desktop\photo', 'png');
+
+  insert into public.building_photos_link_file (file_id, building_id)
+  select f.id, 2 from public.file f where f.name = 'roof_approval_b2';
   ```
   ### building_roof_link_file
   Добавление файлов крыши объекта (сначала файл, потом инстерт в третью таблицу):
@@ -363,6 +382,8 @@ where c.company_type = 'дилер'
   person_id | id из таблицы [person](#person)
   Запись о просмотре объекта:
   ```sql
+  insert into public.visit_building (building_id, person_id)
+  values (2, 4);
   ```
   ### diagnostic
   Поле | Описание
@@ -372,6 +393,10 @@ where c.company_type = 'дилер'
   building_id | id из таблицы [building](#building)
   Создание диагностики:
   ```sql
+  insert into public.diagnostic ( diagnostic_date, diagnostic_type, building_id)
+  select '2020-10-27', 'полная', b.id
+  from "public".building b
+  where b.name = 'ЖК Рассвет';
   ```
   ### diagnostic_link_file
   Получение полной информации о диагностике:
@@ -388,9 +413,14 @@ where c.company_type = 'дилер'
   building_id | id из таблицы [building](#building)
   Созадание презентации:
   ```sql
+  insert into public.presentation (presentation_date, business_info_id, building_id)
+  values ('2020-09-22', 1 ,3), ('2020-10-22', 2 ,1), ('2020-12-12', 3, 2);
   ```
   Получение всех презентаций объекта отсортированнх по дате создания (обратный порядок):
   ```sql
+  select * from public.presentation p
+  where p.building_id = 3
+  order by p.created desc;
   ```
   ### supply
   Таблица содержит информацию о заяках на поставку
@@ -406,6 +436,11 @@ where c.company_type = 'дилер'
   status | строка для статуса заявки на поставку: одобрена, не одобрена, на рассмотрении. По умолчанию 'на рассмотрении'
   Подача заявки на поставку дилером:
   ```sql
+insert into public.supply (
+    supply_date, material_amount, cost, requestor_name, telephone, email, comments, status, company_id, building_id)
+select '2019-12-12', 3450, 300000, 'supply_requestor1', '354265787', 'requestor1@mail.ru', 'comment', 'не одобрена', c.id, b.id
+from "public".company c, "public".building b
+where c.name = 'company_4' and b.name = 'ЖК Рассвет';
   ```
   Получение всех открытых заявок в кластере:
   ```sql
@@ -424,4 +459,9 @@ where c.company_type = 'дилер'
   ```
   Создание заявки на объект дилером:
   ```sql
-  ```
+  insert into public.request (
+  	requestor_name, telephone, email, comments, status, company_id, building_id)
+  select 'requestor_3', '9234739', 'requestor_3@mail.ru', 'comments', 'не одобрена', c.id, b.id
+  from "public".company c, "public".building b
+  where c.name = 'company_2' and b.name = 'ЖК Рассвет';
+    ```
