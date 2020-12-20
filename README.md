@@ -17,7 +17,7 @@ create view public.city_to_cluster as
     select city.id as city_id, 
     COALESCE(cl2c.cluster_id, cl2r.cluster_id, cl2d.cluster_id) as cluster_id
     from public.city
-    full outer join public.cluster_link_city cl2c on cl2c.city_id = city."id"
+    full outer join public.cluster_link_city cl2c on cl2c.city_id = city.id
     full outer join public.cluster_link_region cl2r on cl2r.region_id = city.region_id
     full outer join public.region r on r.id = city.region_id
     full outer join public.cluster_link_district cl2d on cl2d.district_id = r.district_id;
@@ -288,7 +288,7 @@ create view public.city_to_cluster as
   Создание нового Коммерческого предложения. Получение последнего созданного:
   ```sql
   insert into public.commercial_proposal (date, file_id)
-  select '2020-09-15', id FROM public.file WHERE name = 'file_name';
+  select '2020-09-15', id from public.file WHERE name = 'file_name';
 
   select * from public.commercial_proposal
   order by created desc limit 1;
@@ -398,12 +398,23 @@ create view public.city_to_cluster as
   ```
   Получение всех завершенных объектов данного дилера отсортированных по сумме затрат на материалы:
   ```sql
+  select * from public.building b
+  left outer join  public.city_to_cluster c2cl on c2cl.city_id = b.city_id
+  left outer join public.cluster cl on cl.id = c2cl.cluster_id
+  where b.status = 'завершенный' and b.dealer_id = 1
+  order by b.square_roof*cl.base_cost desc;
   ```
   Получение всех объектов без дилера в регионе:
   ```sql
+  select * from public.building b
+  left outer join public.city on city.id = b.city_id
+  where b.dealer_id is null and city.region_id = 68;
   ```
   Получение всех объектов в кластере:
   ```sql
+  select * from "public".building b
+  left outer join public.city_to_cluster c2cl on c2cl.city_id = b.city_id
+  where c2cl.cluster_id = 4;
   ```
 
   Получение последних 10 просмотренных объектов:
@@ -506,7 +517,6 @@ create view public.city_to_cluster as
   select * from public.request r 
   join public.cluster cl on cl.distributor_id = r.company_id
   where r.status = 'на рассмотрении' and cl.id = 1;
-
   ```
   Создание заявки на объект дилером:
   ```sql
@@ -515,4 +525,4 @@ create view public.city_to_cluster as
   select 'requestor_3', '9234739', 'requestor_3@mail.ru', 'comments', 'не одобрена', c.id, b.id
   from "public".company c, "public".building b
   where c.name = 'company_2' and b.name = 'ЖК Рассвет';
-    ```
+  ```
