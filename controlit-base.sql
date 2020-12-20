@@ -1,5 +1,17 @@
 ALTER DATABASE db_controlit OWNER TO controlit_user;
 
+CREATE FUNCTION public.trigger_set_timestamp()
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+     NOT LEAKPROOF
+AS $BODY$
+BEGIN
+  NEW.updated = NOW();
+  RETURN NEW;
+END;
+$BODY$;
+
+ALTER FUNCTION public.trigger_set_timestamp() OWNER TO controlit_user;
 
 -- Table: public.business_info
 DROP TABLE IF EXISTS public.business_info CASCADE;
@@ -42,7 +54,11 @@ COMMENT ON COLUMN public.business_info.updated IS 'Дата и время пос
 
 COMMENT ON COLUMN public.business_info.deleted IS 'Дата и время удаления';
 
-
+CREATE TRIGGER set_update
+    BEFORE UPDATE OF updated
+    ON public.business_info
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_set_timestamp();
 
 -- Table: public.person
 DROP TABLE IF EXISTS public.person CASCADE;
@@ -64,6 +80,8 @@ CREATE TABLE public.person
     CONSTRAINT person_email_key UNIQUE (email)
 );
 
+COMMENT ON COLUMN public.person.usrrnd IS 'Идентификатор сессии';
+
 COMMENT ON COLUMN public.person.created IS 'Дата и время создания записи';
 
 COMMENT ON COLUMN public.person."updated" IS 'Дата и время последнего обновления записи';
@@ -72,8 +90,13 @@ COMMENT ON COLUMN public.person.last_visit IS 'Дата и время после
 
 COMMENT ON COLUMN public.person.deleted IS 'Дата и время удаления';
 
--- CREATE UNIQUE INDEX users_unique_idx ON users(email) WHERE deleted = NULL;
+-- CREATE UNIQUE INDEX person_unique_idx ON public.person(email) WHERE deleted = NULL;
 
+CREATE TRIGGER set_update
+    BEFORE UPDATE OF updated
+    ON public.person
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_set_timestamp();
 
 -- Table: public.country
 DROP TABLE IF EXISTS public.country CASCADE;
@@ -201,15 +224,23 @@ COMMENT ON COLUMN public.company.bank_account IS 'Расчетный счет ю
 COMMENT ON COLUMN public.company.company_type IS 'Дилер или дистрибьютор';
 
 COMMENT ON COLUMN public.company.availability
- IS 'Признак доступности: включен, выключен и ограничен. По умолчанию включен. Если выключен – пользователь блокируется';
+ IS 'Признак доступности: включен, выключен и ограничен. По умолчанию включен. Если выключен
+  – пользователь блокируется';
 
-COMMENT ON COLUMN public.company.change_dealer IS 'Может менять дилеров. По умолчанию "нет", включается администратором';
+COMMENT ON COLUMN public.company.change_dealer IS 'Может менять дилеров. По умолчанию "нет",
+ включается администратором';
 
 COMMENT ON COLUMN public.company.created IS 'Дата и время создания записи';
 
 COMMENT ON COLUMN public.company.updated IS 'Дата и время последнего обновления записи';
 
 COMMENT ON COLUMN public.company.deleted IS 'Дата и время удаления';
+
+CREATE TRIGGER set_update
+    BEFORE UPDATE OF updated
+    ON public.company
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_set_timestamp();
 
 
 -- Table: public.company_link_region
@@ -256,6 +287,8 @@ CREATE TABLE public.cluster
     id integer DEFAULT nextval('cluster_id_seq') NOT NULL,
     name text NOT NULL,
     base_cost double precision NOT NULL,
+    created timestamp NOT NULL DEFAULT LOCALTIMESTAMP,
+    updated timestamp NOT NULL DEFAULT LOCALTIMESTAMP,
     deleted timestamp,
     distributor_id integer NOT NULL,
     CONSTRAINT cluster_pkey PRIMARY KEY (id),
@@ -264,6 +297,12 @@ CREATE TABLE public.cluster
 );
 
 COMMENT ON COLUMN public.cluster.deleted IS 'Дата и время удаления';
+
+CREATE TRIGGER set_update
+    BEFORE UPDATE OF updated
+    ON public.cluster
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_set_timestamp();
 
 
 -- Table: public.cluster_link_city
@@ -357,27 +396,11 @@ COMMENT ON COLUMN public.file.updated IS 'Дата и время последн�
 
 COMMENT ON COLUMN public.file.deleted IS 'Дата и время удаления';
 
-
--- Table: public.media
-DROP TABLE IF EXISTS public.media CASCADE;
-DROP SEQUENCE IF EXISTS public.media_id_seq CASCADE;
-CREATE SEQUENCE media_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
-
-CREATE TABLE public.media
-(
-    id integer DEFAULT nextval('media_id_seq') NOT NULL,
-    url text NOT NULL,
-    created timestamp NOT NULL DEFAULT LOCALTIMESTAMP,
-    updated timestamp NOT NULL DEFAULT LOCALTIMESTAMP,
-    deleted timestamp,
-    CONSTRAINT media_pkey PRIMARY KEY (id)
-);
-
-COMMENT ON COLUMN public.media.created IS 'Дата и время создания записи';
-
-COMMENT ON COLUMN public.media.updated IS 'Дата и время последнего обновления записи';
-
-COMMENT ON COLUMN public.media.deleted IS 'Дата и время удаления';
+CREATE TRIGGER set_update
+    BEFORE UPDATE OF updated
+    ON public.file
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_set_timestamp();
 
 
 -- Table: public.contract
@@ -389,6 +412,8 @@ CREATE TABLE public.contract
 (
     id integer DEFAULT nextval('contract_id_seq') NOT NULL,
     contract_number text NOT NULL,
+    registration_address character varying(255),
+    address_actual character varying(255),
     created timestamp NOT NULL DEFAULT LOCALTIMESTAMP,
     updated timestamp NOT NULL DEFAULT LOCALTIMESTAMP,
     deleted timestamp,
@@ -406,6 +431,12 @@ COMMENT ON COLUMN public.contract.created IS 'Дата и время созда�
 COMMENT ON COLUMN public.contract.updated IS 'Дата и время последнего обновления записи';
 
 COMMENT ON COLUMN public.contract.deleted IS 'Дата и время удаления';
+
+CREATE TRIGGER set_update
+    BEFORE UPDATE OF updated
+    ON public.contract
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_set_timestamp();
 
 
 -- Table: public.commercial_proposal
@@ -429,6 +460,12 @@ CREATE TABLE public.commercial_proposal
 COMMENT ON COLUMN public.commercial_proposal.created IS 'Дата и время создания записи';
 
 COMMENT ON COLUMN public.commercial_proposal.updated IS 'Дата и время последнего обновления записи';
+
+CREATE TRIGGER set_update
+    BEFORE UPDATE OF updated
+    ON public.commercial_proposal
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_set_timestamp();
 
 
 -- Table: public.building
@@ -505,7 +542,8 @@ COMMENT ON COLUMN public.building.square_roof IS 'Площадь кровли о
 COMMENT ON COLUMN public.building.roof_type IS 'Тип кровли: ПВХ-кровля или битумная наплавляемая';
 
 COMMENT ON COLUMN public.building.roof_description
-    IS 'Описываются марки и производители примененных решений по утеплителю кровли, ее гидроизоляции, пароизоляции, покрытию и т.п.';
+    IS 'Описываются марки и производители примененных решений по утеплителю кровли, ее гидроизоляции, пароизоляции,
+    покрытию и т.п.';
 
 COMMENT ON COLUMN public.building.discount IS 'Скидка объекта. Заполняется администратором';
 
@@ -544,22 +582,42 @@ COMMENT ON COLUMN public.building.technical_client_id IS 'Название те�
 
 COMMENT ON COLUMN public.building.creator_id IS 'Кто создал объект в систему';
 
+CREATE TRIGGER set_update
+    BEFORE UPDATE OF updated
+    ON public.building
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_set_timestamp();
 
--- Table: public.building_link_media
-DROP TABLE IF EXISTS public.building_link_media CASCADE;
 
-CREATE TABLE public.building_link_media
+-- Table: public.media
+DROP TABLE IF EXISTS public.media CASCADE;
+DROP SEQUENCE IF EXISTS public.media_id_seq CASCADE;
+CREATE SEQUENCE media_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+
+CREATE TABLE public.media
 (
-    media_id integer NOT NULL,
+    id integer DEFAULT nextval('media_id_seq') NOT NULL,
+    url text NOT NULL,
     building_id integer NOT NULL,
-    CONSTRAINT building_link_media_pkey PRIMARY KEY (media_id, building_id),
-    CONSTRAINT fk_building_link_media2media_id_id2id FOREIGN KEY (media_id)
-        REFERENCES public.media (id) ON DELETE CASCADE,
-    CONSTRAINT fk_building_link_media2building__building_id2id FOREIGN KEY (building_id)
+    created timestamp NOT NULL DEFAULT LOCALTIMESTAMP,
+    updated timestamp NOT NULL DEFAULT LOCALTIMESTAMP,
+    deleted timestamp,
+    CONSTRAINT media_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_media2building__building_id2id FOREIGN KEY (building_id)
         REFERENCES public.building (id) ON DELETE CASCADE
 );
 
---UNIQUE INDEX on (media_id, building_id)
+COMMENT ON COLUMN public.media.created IS 'Дата и время создания записи';
+
+COMMENT ON COLUMN public.media.updated IS 'Дата и время последнего обновления записи';
+
+COMMENT ON COLUMN public.media.deleted IS 'Дата и время удаления';
+
+CREATE TRIGGER set_update
+    BEFORE UPDATE OF updated
+    ON public.media
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_set_timestamp();
 
 
 -- Table: public.building_photos_link_file
@@ -605,7 +663,7 @@ CREATE TABLE public.building_roof_link_file
 (
     file_id integer NOT NULL,
     building_id integer NOT NULL,
-    CONSTRAINT obejct_roof_link_file_pkey PRIMARY KEY (file_id, building_id),
+    CONSTRAINT building_roof_link_file_pkey PRIMARY KEY (file_id, building_id),
     CONSTRAINT fk_building_roof_link_file2file__file_id2id FOREIGN KEY (file_id)
         REFERENCES public.file (id) ON DELETE CASCADE,
     CONSTRAINT fk_building_roof_link_file2building__building_id2id FOREIGN KEY (building_id)
@@ -644,6 +702,12 @@ COMMENT ON COLUMN public.visit_building.updated IS 'Дата и время по�
 
 COMMENT ON COLUMN public.visit_building.deleted IS 'Дата и время удаления';
 
+CREATE TRIGGER set_update
+    BEFORE UPDATE OF updated
+    ON public.visit_building
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_set_timestamp();
+
 
 -- Table: public.diagnostic
 DROP TABLE IF EXISTS public.diagnostic CASCADE;
@@ -671,6 +735,12 @@ COMMENT ON COLUMN public.diagnostic.diagnostic_type IS 'Вид инструме�
 COMMENT ON COLUMN public.diagnostic.created IS 'Дата и время создания записи';
 
 COMMENT ON COLUMN public.diagnostic.updated IS 'Дата и время последнего обновления записи';
+
+CREATE TRIGGER set_update
+    BEFORE UPDATE OF updated
+    ON public.diagnostic
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_set_timestamp();
 
 
 -- Table: public.diagnostic_link_file
@@ -723,6 +793,12 @@ COMMENT ON COLUMN public.presentation.deleted IS 'Дата и время уда�
 
 COMMENT ON COLUMN public.presentation.business_info_id IS 'Кому проведена';
 
+CREATE TRIGGER set_update
+    BEFORE UPDATE OF updated
+    ON public.presentation
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_set_timestamp();
+
 
 -- Table: public.supply
 DROP TABLE IF EXISTS public.supply CASCADE;
@@ -764,6 +840,12 @@ COMMENT ON COLUMN public.supply.updated IS 'Дата и время послед�
 
 COMMENT ON COLUMN public.supply.deleted IS 'Дата и время удаления';
 
+CREATE TRIGGER set_update
+    BEFORE UPDATE OF updated
+    ON public.supply
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_set_timestamp();
+
 
 -- Table: public.request
 DROP TABLE IF EXISTS public.request CASCADE;
@@ -800,4 +882,76 @@ COMMENT ON COLUMN public.request.updated IS 'Дата и время послед
 
 COMMENT ON COLUMN public.request.deleted IS 'Дата и время удаления';
 
+CREATE TRIGGER set_update
+    BEFORE UPDATE OF updated
+    ON public.request
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_set_timestamp();
 
+
+-- Table: public.specialist
+DROP TABLE IF EXISTS public.specialist CASCADE;
+DROP SEQUENCE IF EXISTS public.specialist_id_seq CASCADE;
+CREATE SEQUENCE specialist_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+
+
+CREATE TABLE public.specialist
+(
+    id integer DEFAULT nextval('specialist_id_seq') NOT NULL,
+    name character varying(255) NOT NULL,
+    telephone character varying(255),
+    email character varying(255),
+    status character varying(255),
+    level character varying(255),
+    more_info_1 character varying(255),
+    more_info_2 character varying(255),
+    more_info_3 character varying(255),
+    city_id integer NOT NULL,
+    company_id integer NOT NULL,
+    created timestamp NOT NULL DEFAULT LOCALTIMESTAMP,
+    updated timestamp NOT NULL DEFAULT LOCALTIMESTAMP,
+    deleted timestamp,
+    CONSTRAINT specialist_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_specialist2city__city_id2id FOREIGN KEY (city_id)
+        REFERENCES public.city (id) ON DELETE CASCADE,
+    CONSTRAINT fk_specialist2company__company_id2id FOREIGN KEY (company_id)
+        REFERENCES public.company (id) ON DELETE CASCADE
+);
+
+COMMENT ON COLUMN public.specialist.level IS 'Уровень подготовки специалиста';
+
+COMMENT ON COLUMN public.specialist.status IS 'Статус сотрудника: работает, уволен.';
+
+COMMENT ON COLUMN public.specialist.created IS 'Дата и время создания записи';
+
+COMMENT ON COLUMN public.specialist.updated IS 'Дата и время последнего обновления записи';
+
+COMMENT ON COLUMN public.specialist.deleted IS 'Дата и время удаления';
+
+CREATE TRIGGER set_update
+    BEFORE UPDATE OF updated
+    ON public.specialist
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_set_timestamp();
+
+-- Table: public.building_link_specialist
+DROP TABLE IF EXISTS public.building_link_specialist CASCADE;
+
+CREATE TABLE public.building_link_specialist
+(
+    specialist_id integer NOT NULL,
+    building_id integer NOT NULL,
+    CONSTRAINT building_link_specialist_pkey PRIMARY KEY (specialist_id, building_id),
+    CONSTRAINT fk_building_link_specialist2specialist__specialist_id2id FOREIGN KEY (specialist_id)
+        REFERENCES public.file (id) ON DELETE CASCADE,
+    CONSTRAINT fk_building_link_specialist2building__building_id2id FOREIGN KEY (building_id)
+        REFERENCES public.building (id) ON DELETE CASCADE
+);
+
+create view public.city_to_cluster as
+    select city.id as city_id, COALESCE(cl2c.cluster_id, cl2r.cluster_id, cl2d.cluster_id) as cluster_id
+    from public.city
+    full outer join public.cluster_link_city cl2c on cl2c.city_id = city."id"
+    full outer join public.cluster_link_region cl2r on cl2r.region_id = city.region_id
+    full outer join public.region r on r.id = city.region_id
+    full outer join public.cluster_link_district cl2d on cl2d.district_id = r.district_id;

@@ -1,36 +1,30 @@
-INSERT INTO public.business_info ( 
+INSERT INTO public.business_info (
     company_name, inn, director, director_telephone, director_email, respondent, respondent_telephone, respondent_email)
 VALUES
-    ( 'company_1', '123456789012', 'Игорь Сргеевич', '79123334455', 'director_1@yandex.ru', 'Федор Олегович',
+    ('company_1', '123456789012', 'Игорь Сргеевич', '79123334455', 'director_1@yandex.ru', 'Федор Олегович',
     '79112223344', 'respondent_1@mail.ru'),
-    ( 'company_2', '210987654321', 'Игорь Петрович',  NULL, 'director_2@yandex.ru', 'Петр Олегович', '79223334455',
+    ('company_2', '210987654321', 'Игорь Петрович',  NULL, 'director_2@yandex.ru', 'Петр Олегович', '79223334455',
     'respondent_1@mail.ru'),
-    ( 'company_3', NULL, 'Алекс Вишенко', NULL, 'director_3@yandex.ru', 'Никита Горыныч', '79334445566',
+    ('company_3', NULL, 'Алекс Вишенко', NULL, 'director_3@yandex.ru', 'Никита Горыныч', '79334445566',
     'respondent_3@mail.ru');
+
 
 INSERT INTO public.person ( email, password, admin)
 VALUES
-    ( 'test1@gmail.ru', '1234', true),
-    ( 'test2@gmail.ru', 'fgh', DEFAULT),
-    ( 'test3@gmail.ru', '1', DEFAULT),
-    ( 'test4@gmail.ru', 'dbh56', true);
+    ('test1@gmail.ru', '1234', true),
+    ('test2@gmail.ru', 'fgh', DEFAULT),
+    ('test3@gmail.ru', '1', DEFAULT),
+    ('test4@gmail.ru', 'dbh56', true);
 
 
 INSERT INTO public.file ( name, path, extension)
 VALUES
-    ( 'file_1', 'C:\Users\dfgdg\dfg', 'txt'),
-    ( 'file_2', 'C:\Users\sdfg\dfg', 'dwg'),
-    ( 'file_3', 'C:\Users\fg', 'png'),
-    ( 'file_4', 'C:\Users\ddgr', 'png'),
-    ( 'file_5', 'C:\Users\drg', 'txt'),
-    ( 'file_6', 'C:\Users\са', 'txt');
-
-INSERT INTO public.media ( url)
-VALUES
-    ( 'url_1'),
-    ( 'url_2'),
-    ( 'url_3'),
-    ( 'url_4');
+    ('file_1', 'C:\Users\dfgdg\dfg', 'txt'),
+    ('file_2', 'C:\Users\sdfg\dfg', 'dwg'),
+    ('file_3', 'C:\Users\fg', 'png'),
+    ('photos_b3', 'C:\Users\S\Desktop\photo', 'png'),
+    ('roof_approval_b2', 'C:\Users\S\Desktop\photo', 'png'),
+    ('roofing_plan', 'C:\Users\S\Desktop\roofing_plan' , 'png');
 
 
 INSERT INTO public.company (
@@ -90,16 +84,50 @@ AND subcontractor.company_name = 'company_2';
 INSERT INTO public.building (
     name, status, building_type, address, square_roof, roof_type, discount, guarantee, start_date, start_date_actual,
     finish_date_actual, city_id, creator_id, subcontractor_id)
-SELECT 'ЖК Рассвет', 'завершенный ', 'жилой', 'г. Казань, ул. Лесная, 4', 3000, 'ПВХ-кровля', 0, 36, '2018-06-15',
+SELECT 'ЖК Рассвет', 'завершенный', 'жилой', 'г. Казань, ул. Лесная, 4', 3000, 'ПВХ-кровля', 0, 36, '2018-06-15',
     '2019-04-17', '2020-09-12', city.id, creator.id, subcontractor.id
 FROM "public".city as city, "public".person as creator, "public".business_info as subcontractor
 WHERE city.name = 'Казань'
 AND creator.email = 'test1@gmail.ru'
 AND subcontractor.company_name = 'company_1';
 
+INSERT INTO public.building (
+    name, status, building_type, square_roof, start_date, start_date_actual, finish_date_actual, city_id, dealer_id, creator_id, subcontractor_id)
+SELECT 'ТЦ Мир', 'завершенный', 'общественный', 1500, '2019-08-12', '2019-10-12', '2020-10-12', city.id, 1, 2, 3
+FROM "public".city as city
+WHERE city.name = 'Москва';
+
+INSERT INTO public.building (
+    name, status, building_type, square_roof, start_date, start_date_actual, finish_date_actual, city_id, dealer_id, creator_id, subcontractor_id)
+SELECT 'ТЦ Мир', 'завершенный', 'общественный', 2000, '2019-08-12', '2019-10-12', '2020-10-12', city.id, 1, 2, 3
+FROM "public".city as city
+WHERE city.name = 'Троицк (Москва)';
+
+
+insert into public.building_photos_link_file (file_id, building_id)
+select f.id, 3 from public.file f where f.name = 'photos_b3';
+
+insert into public.building_roof_approval_link_file (file_id, building_id)
+select f.id, 2 from public.file f where f.name = 'roof_approval_b2';
+
+insert into public.building_roof_link_file (file_id, building_id)
+select f.id, 1 from public.file f where f.name = 'roofing_plan';
+
+
+INSERT INTO public.media (url, building_id)
+VALUES
+    ( 'url_1', 1),
+    ( 'url_2', 2),
+    ( 'url_3', 3),
+    ( 'url_4', 1);
+
 
 INSERT INTO public.commercial_proposal (date, file_id)
-SELECT '2020-09-12', id FROM public.file WHERE name = 'file_5';
+SELECT '2020-09-12', id FROM public.file WHERE name = 'file_1';
+
+INSERT INTO public.commercial_proposal (date, file_id)
+SELECT '2020-09-20', id FROM public.file WHERE name = 'file_2';
+
 
 INSERT INTO public.contract ( contract_number, file_id, company_id)
 SELECT '23fg', file.id, company.id
@@ -121,6 +149,7 @@ SELECT '234', file.id, company.id
 FROM "public"."file" as file, "public".company as company
 WHERE file.name = 'file_4' AND company.name = 'company_3';
 
+
 INSERT INTO public.diagnostic ( diagnostic_date, diagnostic_type, building_id)
 SELECT '2020-07-23', 'полная ', building.id
 FROM "public".building as building
@@ -140,6 +169,11 @@ INSERT INTO public.diagnostic ( diagnostic_date, diagnostic_type, building_id)
 SELECT '2020-10-27', 'полная ', building.id
 FROM "public".building as building
 WHERE building.name = 'ЖК Рассвет';
+
+
+insert into public.diagnostic_link_file (file_id, diagnostic_id)
+values (1, 3), (3, 4), (6, 2);
+
 
 INSERT INTO public.request (
     requestor_name, status, company_id, building_id)
@@ -179,3 +213,73 @@ INSERT INTO public.supply (
 SELECT '2020-07-23', 6000, 1000000, 'supply_requestor_3', 'на рассмотрении', company.id, building.id
 FROM "public".company as company, "public".building as building
 WHERE company.name = 'company_2' AND building.name = 'Завод Юникель';
+
+
+INSERT INTO public.cluster (
+    name, base_cost, distributor_id)
+VALUES
+    ('cluster_1', 250, 1),
+    ('cluster_2', 180, 2),
+    ('cluster_3', 200, 3);
+
+
+INSERT INTO public.cluster_link_city (cluster_id, city_id)
+VALUES (1, 363);
+
+INSERT INTO public.cluster_link_region (cluster_id, region_id)
+VALUES (2, 36);
+
+INSERT INTO public.cluster_link_district (cluster_id, district_id)
+VALUES (3, 8);
+
+INSERT INTO public.cluster_link_country (cluster_id, country_id)
+VALUES (3, 3);
+
+insert into public.company_link_region (company_id, region_id)
+values (2, 36);
+
+
+insert into public.visit_building (building_id, person_id)
+values (1, 2), (2 ,3), (3, 1);
+
+
+insert into public.presentation (presentation_date, business_info_id, building_id)
+values ('2020-09-22', 1 ,3), ('2020-10-22', 2 ,1), ('2020-12-12', 3, 2);
+
+
+insert into public.person_link_company (person_id, company_id)
+values (1, 2), (2, 3), (3, 1);
+
+insert into public.business_info (
+    company_name, inn, director, director_email, respondent, respondent_telephone, respondent_email)
+values
+    ( 'company_4', '123452349012', 'Петр Сргеевич', 'director_4@yandex.ru', 'Федор Петрович',
+    '79112228844', 'respondent_4@mail.ru');
+
+update public.business_info set director_telephone = '79884567092' where id = 4;
+
+insert into public.cluster (name, base_cost, distributor_id)
+values ('cluster_name', 400, 4);
+
+insert into public.file ( name, path, extension)
+values ('file_name', 'C:\Users\abc\dfeg', 'txt');
+
+insert into public.contract (contract_number, file_id, company_id)
+select '123er', file.id, 2 from public.file
+where file.name = 'file_name';
+
+insert into public.media (url, building_id)
+values  ('url_name', 1);
+
+insert into public.visit_building (view_date, building_id, person_id)
+values ('2020-12-5', 2, 4);
+
+insert into public.presentation (presentation_date, business_info_id, building_id)
+values ('2020-06-22', 2 ,3);
+
+
+INSERT INTO public.cluster (name, base_cost, distributor_id)
+VALUES ('cluster_4', 210, 4);
+
+INSERT INTO public.cluster_link_region (cluster_id, region_id)
+SELECT cl.id, 63 from public.cluster cl;
