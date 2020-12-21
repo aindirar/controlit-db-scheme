@@ -487,6 +487,8 @@ create view public.city_to_cluster as
   email | строка
   comments | строка
   status | строка для статуса заявки на поставку: одобрена, не одобрена, на рассмотрении. По умолчанию 'на рассмотрении'
+  company_id | id из таблицы [company](#company)
+  building_id | id из таблицы [building](#building)
   Подача заявки на поставку дилером:
   ```sql
   insert into public.supply (
@@ -512,6 +514,8 @@ create view public.city_to_cluster as
   email | строка
   comments | строка
   status | строка для статуса заявки на поставку: одобрена, не одобрена, на рассмотрении. По умолчанию 'на рассмотрении'
+  company_id | id из таблицы [company](#company)
+  building_id | id из таблицы [building](#building)
   Получение открытых запросов на объекты дилерами в кластере:
   ```sql
   select * from public.request r 
@@ -526,3 +530,20 @@ create view public.city_to_cluster as
   from "public".company c, "public".building b
   where c.name = 'company_2' and b.name = 'ЖК Рассвет';
   ```
+  
+  ### specialist
+  Таблица содержит информацию о сотрудниках/специалистах компании
+  Поле | Описание
+  ------------ | -------------
+  name | строка для ФИО сотрудника
+  telephone | строка
+  email | строка
+  status | строка для статуса сотрудника: работает, уволен
+  level | строка для указания уровень подготовки специалиста
+  more_info_1 | строка дополнительно 
+  more_info_2 | строка дополнительно
+  more_info_3 | строка дополнительно
+  city_id | id из таблицы [city](#city)
+  company_id | id из таблицы [company](#company)
+
+
