@@ -54,9 +54,8 @@ COMMENT ON COLUMN public.business_info.updated IS 'Дата и время пос
 
 COMMENT ON COLUMN public.business_info.deleted IS 'Дата и время удаления';
 
-CREATE TRIGGER set_update
-    BEFORE UPDATE OF updated
-    ON public.business_info
+CREATE TRIGGER set_update_business_info
+    BEFORE UPDATE ON public.business_info
     FOR EACH ROW
     EXECUTE PROCEDURE public.trigger_set_timestamp();
 
@@ -92,9 +91,8 @@ COMMENT ON COLUMN public.person.deleted IS 'Дата и время удален�
 
 -- CREATE UNIQUE INDEX person_unique_idx ON public.person(email) WHERE deleted = NULL;
 
-CREATE TRIGGER set_update
-    BEFORE UPDATE OF updated
-    ON public.person
+CREATE TRIGGER set_update_person
+    BEFORE UPDATE ON public.person
     FOR EACH ROW
     EXECUTE PROCEDURE public.trigger_set_timestamp();
 
@@ -236,9 +234,8 @@ COMMENT ON COLUMN public.company.updated IS 'Дата и время послед
 
 COMMENT ON COLUMN public.company.deleted IS 'Дата и время удаления';
 
-CREATE TRIGGER set_update
-    BEFORE UPDATE OF updated
-    ON public.company
+CREATE TRIGGER set_update_company
+    BEFORE UPDATE ON public.company
     FOR EACH ROW
     EXECUTE PROCEDURE public.trigger_set_timestamp();
 
@@ -298,9 +295,8 @@ CREATE TABLE public.cluster
 
 COMMENT ON COLUMN public.cluster.deleted IS 'Дата и время удаления';
 
-CREATE TRIGGER set_update
-    BEFORE UPDATE OF updated
-    ON public.cluster
+CREATE TRIGGER set_update_cluster
+    BEFORE UPDATE ON public.cluster
     FOR EACH ROW
     EXECUTE PROCEDURE public.trigger_set_timestamp();
 
@@ -396,9 +392,8 @@ COMMENT ON COLUMN public.file.updated IS 'Дата и время последн�
 
 COMMENT ON COLUMN public.file.deleted IS 'Дата и время удаления';
 
-CREATE TRIGGER set_update
-    BEFORE UPDATE OF updated
-    ON public.file
+CREATE TRIGGER set_update_file
+    BEFORE UPDATE ON public.file
     FOR EACH ROW
     EXECUTE PROCEDURE public.trigger_set_timestamp();
 
@@ -432,9 +427,8 @@ COMMENT ON COLUMN public.contract.updated IS 'Дата и время после�
 
 COMMENT ON COLUMN public.contract.deleted IS 'Дата и время удаления';
 
-CREATE TRIGGER set_update
-    BEFORE UPDATE OF updated
-    ON public.contract
+CREATE TRIGGER set_update_contract
+    BEFORE UPDATE ON public.contract
     FOR EACH ROW
     EXECUTE PROCEDURE public.trigger_set_timestamp();
 
@@ -461,9 +455,8 @@ COMMENT ON COLUMN public.commercial_proposal.created IS 'Дата и время 
 
 COMMENT ON COLUMN public.commercial_proposal.updated IS 'Дата и время последнего обновления записи';
 
-CREATE TRIGGER set_update
-    BEFORE UPDATE OF updated
-    ON public.commercial_proposal
+CREATE TRIGGER set_update_commercial_proposal
+    BEFORE UPDATE ON public.commercial_proposal
     FOR EACH ROW
     EXECUTE PROCEDURE public.trigger_set_timestamp();
 
@@ -582,9 +575,8 @@ COMMENT ON COLUMN public.building.technical_client_id IS 'Название те�
 
 COMMENT ON COLUMN public.building.creator_id IS 'Кто создал объект в систему';
 
-CREATE TRIGGER set_update
-    BEFORE UPDATE OF updated
-    ON public.building
+CREATE TRIGGER set_update_building
+    BEFORE UPDATE ON public.building
     FOR EACH ROW
     EXECUTE PROCEDURE public.trigger_set_timestamp();
 
@@ -613,9 +605,8 @@ COMMENT ON COLUMN public.media.updated IS 'Дата и время последн
 
 COMMENT ON COLUMN public.media.deleted IS 'Дата и время удаления';
 
-CREATE TRIGGER set_update
-    BEFORE UPDATE OF updated
-    ON public.media
+CREATE TRIGGER set_update_media
+    BEFORE UPDATE ON public.media
     FOR EACH ROW
     EXECUTE PROCEDURE public.trigger_set_timestamp();
 
@@ -702,9 +693,8 @@ COMMENT ON COLUMN public.visit_building.updated IS 'Дата и время по�
 
 COMMENT ON COLUMN public.visit_building.deleted IS 'Дата и время удаления';
 
-CREATE TRIGGER set_update
-    BEFORE UPDATE OF updated
-    ON public.visit_building
+CREATE TRIGGER set_update_visit_building
+    BEFORE UPDATE ON public.visit_building
     FOR EACH ROW
     EXECUTE PROCEDURE public.trigger_set_timestamp();
 
@@ -736,9 +726,8 @@ COMMENT ON COLUMN public.diagnostic.created IS 'Дата и время созд�
 
 COMMENT ON COLUMN public.diagnostic.updated IS 'Дата и время последнего обновления записи';
 
-CREATE TRIGGER set_update
-    BEFORE UPDATE OF updated
-    ON public.diagnostic
+CREATE TRIGGER set_update_diagnostic
+    BEFORE UPDATE ON public.diagnostic
     FOR EACH ROW
     EXECUTE PROCEDURE public.trigger_set_timestamp();
 
@@ -793,9 +782,8 @@ COMMENT ON COLUMN public.presentation.deleted IS 'Дата и время уда�
 
 COMMENT ON COLUMN public.presentation.business_info_id IS 'Кому проведена';
 
-CREATE TRIGGER set_update
-    BEFORE UPDATE OF updated
-    ON public.presentation
+CREATE TRIGGER set_update_presentation
+    BEFORE UPDATE ON public.presentation
     FOR EACH ROW
     EXECUTE PROCEDURE public.trigger_set_timestamp();
 
@@ -840,9 +828,8 @@ COMMENT ON COLUMN public.supply.updated IS 'Дата и время послед�
 
 COMMENT ON COLUMN public.supply.deleted IS 'Дата и время удаления';
 
-CREATE TRIGGER set_update
-    BEFORE UPDATE OF updated
-    ON public.supply
+CREATE TRIGGER set_update_supply
+    BEFORE UPDATE ON public.supply
     FOR EACH ROW
     EXECUTE PROCEDURE public.trigger_set_timestamp();
 
@@ -882,9 +869,8 @@ COMMENT ON COLUMN public.request.updated IS 'Дата и время послед
 
 COMMENT ON COLUMN public.request.deleted IS 'Дата и время удаления';
 
-CREATE TRIGGER set_update
-    BEFORE UPDATE OF updated
-    ON public.request
+CREATE TRIGGER set_update_request
+    BEFORE UPDATE ON public.request
     FOR EACH ROW
     EXECUTE PROCEDURE public.trigger_set_timestamp();
 
@@ -928,9 +914,8 @@ COMMENT ON COLUMN public.specialist.updated IS 'Дата и время посл�
 
 COMMENT ON COLUMN public.specialist.deleted IS 'Дата и время удаления';
 
-CREATE TRIGGER set_update
-    BEFORE UPDATE OF updated
-    ON public.specialist
+CREATE TRIGGER set_update_specialist
+    BEFORE UPDATE ON public.specialist
     FOR EACH ROW
     EXECUTE PROCEDURE public.trigger_set_timestamp();
 
