@@ -273,6 +273,7 @@ create view public.city_to_cluster as
   address_actual | строка для фактического адреса проживания
   file_id | id из таблицы [file](#file)
   company_id | id из таблицы [company](#company)
+  
   Создание договора с юрлицом (сначала файл, потом запись в контракт):
   ```sql
   insert into public.contract (contract_number, file_id, company_id)
@@ -364,6 +365,7 @@ create view public.city_to_cluster as
   ------------ | -------------
   url | строка
   building_id | id из таблицы [building](#building)
+  
   Создание медиа об объекте:
   ```sql
   insert into public.media (url, building_id)
