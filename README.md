@@ -208,7 +208,7 @@ create view public.city_to_cluster as
   name | строка
   base_cost | `double precision` 
   distributor_id | id из таблицы [company](#company)
-
+#####
   Установка дистрибьютера:
   ```sql
   insert into public.cluster (name, base_cost, distributor_id)
@@ -256,6 +256,7 @@ create view public.city_to_cluster as
   name | строка названия файла
   path | строка для указания пути до файсла
   extension | строка расширения файла
+  #####
   Создание файла:
   ```sql
   insert into public.file ( name, path, extension)
@@ -285,6 +286,7 @@ create view public.city_to_cluster as
   ------------ | -------------
   date | `date` дата создания коммерческого предложения
   file_id | id из таблицы [file](#file)
+  #####
   Создание нового Коммерческого предложения. Получение последнего созданного:
   ```sql
   insert into public.commercial_proposal (date, file_id)
@@ -324,6 +326,7 @@ create view public.city_to_cluster as
   planner_id | id из таблицы [business_info](#business_info)
   general_contractor_id | id из таблицы [business_info](#business_info)
   technical_client_id | id из таблицы [business_info](#business_info)
+  #####
   Получение общей информации по объекту (по всем полям вложенные join):
   ```sql
   select b.*, bra2f.file_id, bph2f.file_id, br2f.file_id, b2s.specialist_id, vb.view_date, 
@@ -430,6 +433,7 @@ create view public.city_to_cluster as
   view_date | `timestamp` без таймзоны. Все значения хранятся в UTC. По умолчанию устанавливает текущее временное значение.
   building_id | id из таблицы [building](#building)
   person_id | id из таблицы [person](#person)
+  #####
   Запись о просмотре объекта:
   ```sql
   insert into public.visit_building (building_id, person_id)
@@ -441,6 +445,7 @@ create view public.city_to_cluster as
   diagnostic_date | `date` дата проведения инструментальной диагностики
   diagnostic_type | строка для увказания вида инструментальной диагностики: полная или локальная
   building_id | id из таблицы [building](#building)
+  #####
   Создание диагностики:
   ```sql
   insert into public.diagnostic (diagnostic_date, diagnostic_type, building_id)
@@ -489,6 +494,7 @@ create view public.city_to_cluster as
   status | строка для статуса заявки на поставку: одобрена, не одобрена, на рассмотрении. По умолчанию 'на рассмотрении'
   company_id | id из таблицы [company](#company)
   building_id | id из таблицы [building](#building)
+  
   Подача заявки на поставку дилером:
   ```sql
   insert into public.supply (
@@ -516,6 +522,7 @@ create view public.city_to_cluster as
   status | строка для статуса заявки на поставку: одобрена, не одобрена, на рассмотрении. По умолчанию 'на рассмотрении'
   company_id | id из таблицы [company](#company)
   building_id | id из таблицы [building](#building)
+  
   Получение открытых запросов на объекты дилерами в кластере:
   ```sql
   select * from public.request r 
